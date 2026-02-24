@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
+import { server } from "../main";
 
 const ChatContext = createContext();
 
@@ -17,7 +18,7 @@ export const ChatProvider = ({ children }) => {
   async function fetchChats() {
     setChatsLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/chat/all", {
+      const response = await axios.get(`${server}/api/chat/all`, {
         headers: {
           token: localStorage.getItem("token")
         }
@@ -34,7 +35,7 @@ export const ChatProvider = ({ children }) => {
   async function createNewChat() {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/chat/new",
+        `${server}/api/chat/new`,
         {},
         {
           headers: {
@@ -56,7 +57,7 @@ export const ChatProvider = ({ children }) => {
   async function fetchConversations(chatId) {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/chat/${chatId}`,
+        `${server}/api/chat/${chatId}`,
         {
           headers: {
             token: localStorage.getItem("token")
@@ -78,7 +79,7 @@ export const ChatProvider = ({ children }) => {
     try {
       console.log('Updating chat:', chatId, updates);
       const response = await axios.put(
-        `http://localhost:5000/api/chat/${chatId}`,
+        `${server}/api/chat/${chatId}`,
         updates,
         {
           headers: {
@@ -111,7 +112,7 @@ export const ChatProvider = ({ children }) => {
   async function deleteChat(chatId) {
     try {
       console.log('Deleting chat:', chatId);
-      await axios.delete(`http://localhost:5000/api/chat/${chatId}`, {
+      await axios.delete(`${server}/api/chat/${chatId}`, {
         headers: {
           token: localStorage.getItem("token")
         }
@@ -157,7 +158,7 @@ export const ChatProvider = ({ children }) => {
     try {
       // Get AI response
       const aiResponse = await axios.post(
-        "http://localhost:5000/api/chat/ai",
+        `${server}/api/chat/ai`,
         { prompt: userPrompt },
         {
           headers: {
@@ -170,7 +171,7 @@ export const ChatProvider = ({ children }) => {
 
       // Save conversation to database
       await axios.post(
-        `http://localhost:5000/api/chat/${currentChat._id}`,
+        `${server}/api/chat/${currentChat._id}`,
         {
           question: userPrompt,
           answer: answer
