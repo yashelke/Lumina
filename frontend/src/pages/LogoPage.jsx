@@ -96,7 +96,7 @@ export default function LogoPage() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.8 }}
         >
-          Lumina.
+          Lumina
         </motion.h1>
 
         {/* Tagline */}
@@ -109,13 +109,13 @@ export default function LogoPage() {
           Your intelligent AI companion
         </motion.p> */}
 
-        {/* Progress bar — fills over ~10 seconds */}
+        {/* Progress bar — fills over ~6 seconds */}
         <motion.div className="loading-bar-track">
           <motion.div
             className="loading-bar"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 9.5, ease: 'linear', delay: 0.5 }}
+            transition={{ duration: 5, ease: 'easeInOut', delay: 0.5 }}
           />
         </motion.div>
       </div>

@@ -8,13 +8,18 @@ import sendMail from '../middlewares/sendMail.js';
 
 export const loginUser = async(req,res) => {
     try{
-        const {email} = req.body;
+        const {username , email} = req.body;
 
         let user = await User.findOne({email});
+
+        // check if user already exists or not, if not then create new user and send otp to email for verification. If user already exists then also send otp to email for verification. This is because we are using same login form for both login and signup.
+
+        
 
         if(!user)
         {
             user =  await User.create({
+                username,
                 email,
             });
 

@@ -24,6 +24,8 @@ export const UserProvider = ({ children }) => {
 
       toast.success(data.message);
       localStorage.setItem("verifyToken", data.verifyToken);
+      // We are also storing email in localStorage to display the user email in header section of chatbot after login and verification.
+      localStorage.setItem("email",email);
       navigate("/verify");
 
       setBtnLoading(false);
@@ -55,6 +57,7 @@ export const UserProvider = ({ children }) => {
       toast.success(data.message);
       localStorage.clear();
       localStorage.setItem("token", data.token);
+      localStorage.setItem("email",data.user.email);
       navigate("/");
       setIsAuth(true);
       setUser(data.user);

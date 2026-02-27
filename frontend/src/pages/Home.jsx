@@ -7,8 +7,13 @@ import { CgProfile } from "react-icons/cg";
 import { FaRobot } from "react-icons/fa";
 import { LoadingSmall } from '../components/Loading';
 import { IoIosSend } from "react-icons/io";
+import {useTypewriter, Cursor} from "react-simple-typewriter";
 
 const Home = () => {
+
+  // get user email fro LocalStorage to display the user email who is loggedin in the chatbot in the header section.
+
+  const user = localStorage.getItem("email") || "User";
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -25,6 +30,16 @@ const Home = () => {
 
     fetchResponse();
   }
+
+  // Implementing typewriter effect in messages container.
+
+  const [ text ] = useTypewriter({
+    words:["Hello, How can I assist you today?", "What would you like to learn about?", "Explore LuminaStudio - Your AI Image Generator!"],
+    loop: 0,
+    typeSpeed: 60,
+    deleteSpeed: 35,
+    delaySpeed: 1800,
+  });
 
 
   return (
@@ -45,7 +60,15 @@ const Home = () => {
             <div className="mt-2 text-center">
               <p className="text-sm text-gray-400">Current Chat: <span className="text-white font-medium">{selectedChat.title}</span></p>
             </div>
+
+          
           )}
+
+            {/*  display user email on right corner of header */}
+            <div className="absolute top-4 right-4">
+              <h2 className="text-semibold text-white">Welcome: <em>{user}</em></h2>
+            </div>
+        
         </div>
 
         {/* Messages Container */}
@@ -95,7 +118,7 @@ const Home = () => {
                 ))
               ) : (
                 <div className="flex items-center justify-center h-full">
-                  <em className="text-white font-extralight text-base md:text-lg text-center px-4">Hello, How can I assist you today?</em>
+                  <span className="text-white font-semibold text-base md:text-lg text-center px-4"><em>{text}<Cursor cursorStyle="|" cursorColor="#60a5fa" /></em></span>
                 </div>
               )
             }

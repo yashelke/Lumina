@@ -112,6 +112,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     navigate("/login");
   };
 
+  const gotoStudio =() =>
+  {
+    navigate("/studio");
+  }
+
   const activeChats = chats.filter((chat) => !chat.archived);
   const archivedChats = chats.filter((chat) => chat.archived);
   const displayChats = showArchived ? archivedChats : activeChats;
@@ -257,6 +262,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             </div>
           ))
         )}
+      </div>
+
+      {/* LuminaStudio - a feature to be implemented later on */}
+
+      <div className="shrink-0 p-4 mt-4">
+        <button onClick={gotoStudio} className="text-white w-full bg-violet-600 py-2 rounded-md hover:text-yellow-400 transition-colors">✨LuminaStudio</button>
       </div>
 
       {/* ── Logout ── */}
