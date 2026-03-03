@@ -1,13 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar';
 import { GiHamburgerMenu } from "react-icons/gi";
 import Header from '../components/Header';
 import { ChatData } from '../context/ChatContext';
 import { CgProfile } from "react-icons/cg";
 import { FaRobot } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
+import { SlLike, SlDislike } from "react-icons/sl";
 import { LoadingSmall } from '../components/Loading';
 import { IoIosSend } from "react-icons/io";
+import { MdContentCopy } from "react-icons/md";
+
 import {useTypewriter, Cursor} from "react-simple-typewriter";
+import ReactMarkdown from 'react-markdown';
+import toast from 'react-hot-toast';
 
 const Home = () => {
 
@@ -16,10 +22,50 @@ const Home = () => {
   const user = localStorage.getItem("email") || "User";
 
   const [isOpen, setIsOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [feedbacks, setFeedbacks] = useState({});
+
+  const handleFeedback = (index, type) => {
+    const current = feedbacks[index];
+    const next = current === type ? null : type;
+    setFeedbacks(prev => ({ ...prev, [index]: next }));
+    if (next === 'like') {
+      // toast.success('Thanks for the feedback!', { icon: '👍', id: 'feedback' });
+      toast.success("👍 Thanks for the feedback!")
+    } else if (next === 'dislike') {
+      // toast.error("Sorry to hear that! We'll improve.", { icon: '👎', id: 'feedback' });
+      toast.error("Sorry to hear that! We'll improve.")
+    }
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("✅ Response copied to clipboard!");
+    } catch (error) {
+      toast.error("❌ Failed to copy response");
+      console.error('Copy failed:', error);
+    }
+  };
 
   const toggleSidebar = () =>{
     setIsOpen(!isOpen);
   }
+
+  const toggleDropdown = (index) => {
+    setOpenDropdown(openDropdown === index ? null : index);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.profile-dropdown-container')) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
 
   const {fetchResponse, messages, prompt, setPrompt, newRequestLoading, selectedChat } = ChatData();
@@ -85,8 +131,26 @@ const Home = () => {
                           <p className="text-white text-sm md:text-base break-words">{message.question}</p>
                         </div>
                       </div>
-                      <div className="flex-shrink-0 bg-white p-1.5 md:p-2 rounded-full text-black text-lg md:text-xl w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
-                        <CgProfile />
+                      <div className="relative profile-dropdown-container flex-shrink-0">
+                        <button
+                          onClick={() => toggleDropdown(index)}
+                          className="bg-white p-1.5 md:p-2 rounded-full text-black text-lg md:text-xl w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                        >
+                          <CgProfile />
+                        </button>
+                        {openDropdown === index && (
+                          <div className="absolute right-0 top-full mt-1 w-36 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
+                            <button
+                              className="w-full text-left px-4 py-2.5 text-sm text-white hover:bg-gray-700 hover:text-blue-600 transition-colors"
+                              onClick={() => {
+                                // Edit functionality will be wired later
+                                setOpenDropdown(null);
+                              }}
+                            >
+                               ✨  Edit Prompt
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -97,8 +161,77 @@ const Home = () => {
                           <FaRobot />
                         </div>
                         <div className="flex-1 max-w-[85%] md:max-w-[70%]">
-                          <div className="p-3 md:p-4 rounded-lg bg-gray-800">
-                            <p className="text-white text-sm md:text-base break-words" dangerouslySetInnerHTML={{__html: message.answer}}></p>
+                          <div className="p-3 md:p-4 rounded-lg bg-gray-800 text-sm md:text-base text-white">
+                            <ReactMarkdown
+                              components={{
+                                p: ({children}) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                                strong: ({children}) => <strong className="font-semibold text-blue-300">{children}</strong>,
+                                em: ({children}) => <em className="italic text-gray-300">{children}</em>,
+                                ul: ({children}) => <ul className="list-disc list-inside space-y-1 my-2 pl-2">{children}</ul>,
+                                ol: ({children}) => <ol className="list-decimal list-inside space-y-1 my-2 pl-2">{children}</ol>,
+                                li: ({children}) => <li className="leading-relaxed">{children}</li>,
+                                h1: ({children}) => <h1 className="text-lg font-bold text-white mt-3 mb-1">{children}</h1>,
+                                h2: ({children}) => <h2 className="text-base font-bold text-white mt-3 mb-1">{children}</h2>,
+                                h3: ({children}) => <h3 className="text-sm font-semibold text-white mt-2 mb-1">{children}</h3>,
+                                code: ({inline, children}) => inline
+                                  ? <code className="bg-gray-700 text-blue-300 px-1 py-0.5 rounded text-xs font-mono">{children}</code>
+                                  : <pre className="bg-gray-700 rounded p-3 my-2 overflow-x-auto text-xs font-mono text-gray-200 whitespace-pre-wrap"><code>{children}</code></pre>,
+                                blockquote: ({children}) => <blockquote className="border-l-4 border-blue-500 pl-3 my-2 text-gray-300 italic">{children}</blockquote>,
+                                hr: () => <hr className="border-gray-600 my-3" />,
+                              }}
+                            >
+                              {message.answer}
+                            </ReactMarkdown>
+                          </div>
+
+                          {/* Like / Dislike row */}
+                          <div className="flex items-center gap-3 mt-2 pl-1">
+                            {/* Like */}
+                            <figure className="relative group">
+                              <button
+                                onClick={() => handleFeedback(index, 'like')}
+                                className={`p-1.5 md:p-2 rounded-md transition-colors ${
+                                  feedbacks[index] === 'like'
+                                    ? 'text-green-400 bg-green-400/10'
+                                    : 'text-gray-400 hover:text-green-400 hover:bg-green-400/10'
+                                }`}
+                              >
+                                <SlLike size={15} className="md:w-4 md:h-4" />
+                              </button>
+                              <figcaption className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-700 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
+                                Like response
+                              </figcaption>
+                            </figure>
+
+                            {/* Dislike */}
+                            <figure className="relative group">
+                              <button
+                                onClick={() => handleFeedback(index, 'dislike')}
+                                className={`p-1.5 md:p-2 rounded-md transition-colors ${
+                                  feedbacks[index] === 'dislike'
+                                    ? 'text-red-400 bg-red-400/10'
+                                    : 'text-gray-400 hover:text-red-400 hover:bg-red-400/10'
+                                }`}
+                              >
+                                <SlDislike size={15} className="md:w-4 md:h-4" />
+                              </button>
+                              <figcaption className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-700 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
+                                Dislike response
+                              </figcaption>
+                            </figure>
+
+                            {/* Copy response */}
+
+                            <figure className="relative group">
+                              <button onClick={() => copyToClipboard(message.answer)} className="p-1.5 md:p-2 rounded-md text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 transition-colors">
+                                <MdContentCopy size={15} className="md:w-4 md:h-4" />
+                              </button>
+                              <figcaption className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-700 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
+                                Copy response
+                              </figcaption>
+                            </figure>
+
+
                           </div>
                         </div>
                       </div>

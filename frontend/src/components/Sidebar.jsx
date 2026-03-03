@@ -122,12 +122,21 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const displayChats = showArchived ? archivedChats : activeChats;
 
   return (
-    <div
-      className={`fixed inset-0 flex flex-col bg-gray-800 transition-transform transform
-        md:relative md:translate-x-0 md:w-1/4 md:flex ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-    >
+    <>
+      {/* Dark backdrop — mobile only, shown when sidebar is open */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={toggleSidebar}
+        />
+      )}
+
+      <div
+        className={`fixed inset-y-0 left-0 z-40 flex flex-col bg-gray-800 w-72 transition-transform transform
+          md:relative md:inset-auto md:translate-x-0 md:w-1/4 md:h-full md:flex ${
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+      >
       {/* ── Top: logo + new-chat + section header ── */}
       <div className="shrink-0 p-4">
         <button
@@ -279,7 +288,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           Logout
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

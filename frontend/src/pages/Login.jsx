@@ -28,7 +28,7 @@ const Login = () => {
           onSubmit={submitHandler}
           className="bg-white p-6 rounded shadow-md w-full md:w-[500px]"
         >
-          <h2 className=" text-2xl font-bold mb-4">Login</h2>
+          <h2 className=" text-center text-2xl font-bold mb-4">Login</h2>
           <div className="mb-4">
             <label
               className="block text-gray-700  font-bold mb-2"

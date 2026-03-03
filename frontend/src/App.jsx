@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Verify from "./pages/Verify";
@@ -45,6 +46,7 @@ const App = () => {
 
   return (
     <>
+     
       {/* AnimatePresence drives the logo-page exit fade */}
       <AnimatePresence mode="wait">
         {showSplash && <LogoPage key="splash" />}
