@@ -3,11 +3,14 @@ import { useState } from "react";
 import { UserData } from "../context/UserContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { LoadingSpinner } from "../components/Loading.jsx";
+import { FaGoogle } from "react-icons/fa";
+import { GoogleLogin } from "@react-oauth/google";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
 
-  const { loginUser, btnLoading } = UserData();
+  const { loginUser, handleGoogleLogin, btnLoading } = UserData();
 
   const navigate = useNavigate();
   
@@ -20,6 +23,14 @@ const Login = () => {
     loginUser(email, navigate);
 
     
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    handleGoogleLogin(credentialResponse.credential, navigate);
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google login failed");
   };
   return (
     <>
@@ -53,6 +64,18 @@ const Login = () => {
           >
             {btnLoading ? <LoadingSpinner /> : "Submit"}
           </button>
+
+          {/* Google O-Auth setup */}
+            <div className="mt-4 flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme="outline"
+                size="large"
+              />
+            </div>
+
+
         </form>
       </div>
     </>

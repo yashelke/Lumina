@@ -69,6 +69,29 @@ export const UserProvider = ({ children }) => {
     }
   }
 
+  // Google OAuth Login Handler
+  async function handleGoogleLogin(token, navigate) {
+    try {
+      const { data } = await axios.post(
+        `${server}/api/user/google`,
+        { token }
+      );
+
+      toast.success(data.message);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("email", data.user.email);
+      
+      // Update UserContext state
+      setIsAuth(true);
+      setUser(data.user);
+      
+      // Redirect to home
+      navigate("/");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Google login failed");
+    }
+  }
+
 // Loading state of user data when page is refreshed and user is already logged in  
 
 const [loading, setLoading] = useState(true);
@@ -102,6 +125,7 @@ const [loading, setLoading] = useState(true);
       value={{
         loginUser,
         verifyUser,
+        handleGoogleLogin,
         btnLoading,
         user,
         isAuth,

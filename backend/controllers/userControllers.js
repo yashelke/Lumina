@@ -1,10 +1,13 @@
 import {User} from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import sendMail from '../middlewares/sendMail.js';
+import { OAuth2Client } from 'google-auth-library';
 
 // one controller for login
 // one for signup
 // one for getting otp on emails via nodemailer
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const loginUser = async(req,res) => {
     try{
@@ -90,6 +93,53 @@ export const myProfile = async(req,res) =>
     {
         res.status(500).json({
             message : error.message,
+        });
+    }
+}
+
+// Google OAuth Controller
+export const googleAuthCallback = async(req, res) => {
+    try {
+        const { token } = req.body;
+
+        if (!token) {
+            return res.status(400).json({
+                message: "Token not provided"
+            });
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const { email, name, picture } = ticket.getPayload();
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            user = await User.create({
+                email,
+                username: name || email.split('@')[0],
+            });
+        }
+
+        // Skip OTP, directly issue JWT token
+        const authToken = jwt.sign(
+            { _id: user._id },
+            process.env.Jwt_sec,
+            { expiresIn: "7d" }
+        );
+
+        res.json({
+            message: "Google login successful",
+            user,
+            token: authToken,
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            message: error.message,
         });
     }
 }
