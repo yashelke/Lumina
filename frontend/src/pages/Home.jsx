@@ -10,6 +10,8 @@ import { SlLike, SlDislike } from "react-icons/sl";
 import { LoadingSmall } from '../components/Loading';
 import { IoIosSend } from "react-icons/io";
 import { MdContentCopy } from "react-icons/md";
+import { ImAttachment } from "react-icons/im";
+
 
 import {useTypewriter, Cursor} from "react-simple-typewriter";
 import ReactMarkdown from 'react-markdown';
@@ -269,7 +271,12 @@ const Home = () => {
               onChange={(e)=> setPrompt(e.target.value)}
               required
             />
-
+            <button 
+              type="button" 
+              className="p-3 md:p-4 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-colors"
+            >
+              <ImAttachment size={20} className="md:w-6 md:h-6" />
+            </button>
             <button 
               type="submit" 
               className="p-3 md:p-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
@@ -277,6 +284,7 @@ const Home = () => {
             >
               <IoIosSend size={20} className="md:w-6 md:h-6" />
             </button>
+
           </form>
         </div>
       </div>
